@@ -110,14 +110,8 @@ class ADB:
         if point:
             self.swipe(point[0], point[1], target_point[0], point[1])
             self.swipe(target_point[0], point[1], target_point[0], target_point[1])
-
-
-adb = ADB()
-adb.connect_device(device='d52112ab')
-adb.list_info()
-
-
 def attack(enemy, exit_enemy):
+    global adb
     adb.click(exit_enemy)
     time.sleep(5)
     while (not adb.check_target('attack')):
@@ -137,6 +131,7 @@ def attack(enemy, exit_enemy):
 def attack_ship(shipname):
     global team1_count
     global changed
+    global adb
     exit_enemy = adb.check_target(shipname, 0.5)
     if exit_enemy:
         attack(shipname, exit_enemy)
@@ -149,6 +144,11 @@ def attack_ship(shipname):
         changed = True
 
 
+
+
+adb = ADB()
+adb.connect_device(device='d52112ab')
+adb.list_info()
 while (True):
     time.sleep(10)
     print('选择6-4')
