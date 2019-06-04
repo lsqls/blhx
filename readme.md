@@ -7,5 +7,4 @@
  `python3 blhx.py`
  #### tips
  单编队脚本死循环效率小
- ![](1.png)
  
