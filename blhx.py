@@ -8,7 +8,6 @@ import random
 def cmd(command):
     return (subprocess.check_output(command, shell=True).decode('gbk').strip())
 
-
 def get_pos(target_img_path, find_img_path, accuracy=0.7):
     target_img = cv2.imread(target_img_path)
     find_img = cv2.imread(find_img_path)
@@ -21,8 +20,7 @@ def get_pos(target_img_path, find_img_path, accuracy=0.7):
     # 计算位置
     pointUpLeft = max_loc
     pointLowRight = (max_loc[0] + find_width, max_loc[1] + find_height)
-    pointCentre = (
-    max_loc[0] + (find_width / random.randint(2, 10)), max_loc[1] + (find_height / random.randint(2, 10)))
+    pointCentre = ((max_loc[0] + (find_width / 2), max_loc[1] + (find_height / 2)))
     if max_val > accuracy:
         return pointCentre
     else:
@@ -63,29 +61,16 @@ class ADB:
         # print('截图保存在%s'%file_path)
         return file_path
 
-    def click(self, point):
-        # print('click',point)
-        cmd('adb shell input tap %s %s' % (point[0], point[1]))
-        time.sleep(1)
 
-    def click_r_point(self, point):
-        cmd('adb shell input tap %s %s' % (point[0] + random.randint(0, 10), point[1] + random.randint(0, 10)))
-        time.sleep(1)
-
-    def click_r_point(self, x, y):
-        cmd('adb shell input tap %s %s' % (x + random.randint(0, 10), y + random.randint(0, 10)))
-        time.sleep(1)
-
-    def swipe(self, point1, point2):
-        cmd('adb shell input swipe %s %s %s %s' %
-            (point1[0] + random.randint(0, 10), point1[1] + random.randint(0, 10))
-            , point2[0] + random.randint(0, 10), point2[1] + random.randint(0, 10))
+    def click(self, x, y=0):
+        if type(x)==tuple:
+            cmd('adb shell input tap %s %s' % (x[0], x[1]))
+        else:
+            cmd('adb shell input tap %s %s' % (x , y ))
         time.sleep(1)
 
     def swipe(self, x1, y1, x2, y2):
-        cmd('adb shell input swipe %s %s %s %s' %
-            (x1 + random.randint(0, 10), y1 + random.randint(0, 10)
-             , x2 + random.randint(0, 10), y2 + random.randint(0, 10)))
+        cmd('adb shell input swipe %s %s %s %s' %(x1 , y1 , x2 , y2 ))
         time.sleep(1)
 
     def click_target(self, target):
@@ -118,14 +103,14 @@ def attack(enemy, exit_enemy):
         if adb.check_target('avoid'):
             adb.click_target('avoid')
         adb.click(exit_enemy)
-    adb.click_r_point(1645, 964)
+    adb.click(1645, 964)
     time.sleep(25)
     while (not adb.check_target('end_battle')):
         time.sleep(5)
     while (not adb.check_target('end_battle_firm')):
         time.sleep(1)
-        adb.click_r_point(940, 783)
-    adb.click_r_point(1566, 1020)
+        adb.click(940, 783)
+    adb.click(1566, 1020)
 
 
 def attack_ship(shipname):
@@ -145,41 +130,41 @@ def attack_ship(shipname):
 
 
 
-
-adb = ADB()
-adb.connect_device(device='d52112ab')
-adb.list_info()
-while (True):
-    time.sleep(10)
-    print('选择6-4')
-    adb.click_r_point(410, 710)  # 选择6-4
-    print('点击出击')
-    adb.click_r_point(1382, 764)  # 点击出击
-    print('立即前往')
-    adb.click_r_point(1568, 908)  # 立即前往
-    team1_count = 0
-    changed = False
+if __name__=='__main__':
+    adb = ADB()
+    adb.connect_device(device='d52112ab')
+    adb.list_info()
     while (True):
-        # 解决地图问题
-        for ship in ['enemy1', 'enemy2']:
-            time.sleep(5)
-            adb.move('island', (450, 454))
-            print('寻找boss')
-            boss = adb.check_target('boss', 0.7)
-            if boss:
-                print("找到boss")
-                attack('boss', boss)
-                boss_exist = adb.check_target('boss', 0.7)
+        time.sleep(10)
+        print('选择6-4')
+        adb.click(410, 710)  # 选择6-4
+        print('点击出击')
+        adb.click(1382, 764)  # 点击出击
+        print('立即前往')
+        adb.click(1568, 908)  # 立即前往
+        team1_count = 0
+        changed = False
+        while (True):
+            # 解决地图问题
+            for ship in ['enemy1', 'enemy2']:
+                time.sleep(5)
+                adb.move('island', (592, 457.5))
+                print('寻找boss')
+                boss = adb.check_target('boss', 0.7)
+                if boss:
+                    print("找到boss")
+                    attack('boss', boss)
+                    boss_exist = adb.check_target('boss', 0.7)
+                    break
+                print('攻击小船')
+                attack_ship(ship)
+            if boss and not boss_exist:
                 break
-            print('攻击小船')
-            attack_ship(ship)
-        if boss and not boss_exist:
-            break
-# adb.click_r_point(7,255)#弹出左侧
-#
-# adb.click_r_point(253,135)#收石油
-# adb.click_r_point(685,165)#收金币
+    # adb.click_r_point(7,255)#弹出左侧
+    #
+    # adb.click_r_point(253,135)#收石油
+    # adb.click_r_point(685,165)#收金币
 
-# adb.click_r_point(1436,542)#返回主界面
-#
-# adb.click_r_point(1564,616)#出击
+    # adb.click_r_point(1436,542)#返回主界面
+    #
+    # adb.click_r_point(1564,616)#出击
