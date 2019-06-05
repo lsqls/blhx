@@ -123,10 +123,10 @@ def attack_ship(shipname):
         team1_count += 1  # 如果要在函数中给全局变量赋值，需要用global关键字声明
     time.sleep(10)
     print('team1_count', team1_count)
-    if team1_count == 5 and not changed:
-        print('切换舰队')
-        adb.click_target('switch_team')  # 切换舰队
-        changed = True
+    # if team1_count == 5 and not changed:
+    #     print('切换舰队')
+    #     adb.click_target('switch_team')  # 切换舰队
+    #     changed = True
 
 
 
